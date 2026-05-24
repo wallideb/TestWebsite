@@ -25,6 +25,23 @@ The interface must be visually stunning — illustrated backgrounds, real-time i
 
 ---
 
+## Non-Negotiable Rules
+
+1. **All existing functions must work** — identical or enhanced. No regressions, ever.
+2. **New functions require explicit user approval** — if a feature isn't in the approved scope, ask before adding it. Don't invent features under the guise of "polish".
+3. **All agents are active and available at all times.** Any agent in the pipeline can be invoked at any phase if their expertise is needed. They MUST be called before any non-trivial change, new functionality, or any task whose impact spans more than a single file. Default to using them.
+4. **All agents have authority within their scope and skill domain.** When an agent is the right specialist for a question, defer to them.
+5. **No degradation, ever.** If a change risks degrading any user-facing function, accessibility, or performance characteristic, stop and flag it before merging.
+6. **Data integrity is sacred.** Never display uncited data. Every data point traces back to a registered source in `DATA_SOURCES_REGISTRY.md`. Fabricated or unverified data is a critical violation.
+7. **Never attempt a risky change without an agent-evaluated plan.** If a change touches data pipelines, map rendering, API integrations, or real-time feeds — stop and write a plan first, then call relevant agents (Code Reviewer + Backend Architect at minimum) to evaluate impact before applying.
+8. **Minimize concurrent read/write on the same files.** Don't fan out parallel tool calls that touch the same file at the same time. Parallelize only across independent files.
+9. **Big-file creation = chunked appends.** For any file expected to exceed ~300 lines, create it with the first chunk, then append subsequent chunks sequentially.
+10. **Missing assets (photos, species images, icons):** produce a report in `MISSING_ASSETS.md` listing each missing file and its target folder. Use clearly labeled placeholders so pages stay functional.
+11. **Every working session leaves a dated log in `DevLog/`.** See DevLog section below.
+12. **Every session starts by reading the most recent `DevLog/` entry** and this `CLAUDE.md`. Before touching code — read latest DevLog, then act.
+
+---
+
 ## Development Rules
 
 ### General Principles
@@ -76,13 +93,38 @@ All agents are located in the `AIAgents/` folder (cloned from [agency-agents](ht
 | **Security Engineer** | `engineering/engineering-security-engineer.md` | API security, data protection, auth flows |
 | **Code Reviewer** | `engineering/engineering-code-reviewer.md` | Code quality gates before merge |
 
-### Agent Consultation Workflow
-1. **Before any new feature**: consult the **Product Manager** agent for scope and acceptance criteria.
-2. **Architecture decisions**: consult the **Software Architect** and **Backend Architect** agents.
-3. **UI/UX work**: consult **UX Architect**, **UI Designer**, and **Visual Storyteller** agents.
-4. **Data integration**: consult the **Data Engineer** and **Geographer** agents.
-5. **Before merge**: consult the **Code Reviewer** and **Accessibility Auditor** agents.
-6. **Complex multi-step features**: use the **Agents Orchestrator** to coordinate the pipeline.
+### Agent Pipeline — 4 Phases for Any Non-Trivial Task
+
+The four-stage flow — understand, plan, implement, verify — applies to every non-trivial change (bug fix, new feature, data integration, UI component).
+
+**Phase 1 — Understand**
+- **Software Architect** + **Geographer**: map the domain, understand the data landscape, validate geographic coherence
+- When to call: starting a new task, integrating a new data source, working with unfamiliar species/region data
+
+**Phase 2 — Plan / Design**
+- **Product Manager**: scope, acceptance criteria, prioritization
+- **UX Architect** + **UI Designer** + **Visual Storyteller**: CSS system, layout, visual language, species narratives
+- **Backend Architect** + **Data Engineer**: API design, database schema, data pipeline architecture
+- When to call: anything that adds a new page, changes a layout, touches the data model, or integrates a new API
+
+**Phase 3 — Implement**
+- **Frontend Developer**: React components, map interactions, responsive UI
+- **Data Engineer**: ETL pipelines, API client code, data transformation
+- **Rapid Prototyper**: fast MVP validation for uncertain features
+- When to call: active implementation phase
+
+**Phase 4 — Verify**
+- **Accessibility Auditor**: WCAG 2.2 AA compliance, keyboard nav, screen reader testing
+- **Code Reviewer**: code quality gate before merge
+- **Security Engineer**: API security, data protection review
+- When to call: before any merge, before declaring a feature complete
+
+```
+Software Architect  →  Product Manager + UX Architect  →  Frontend Dev + Data Engineer  →  Accessibility Auditor + Code Reviewer
+    (understand)              (plan/design)                      (implement)                         (verify)
+```
+
+For complex multi-step features, use the **Agents Orchestrator** to coordinate the full pipeline.
 
 ---
 
@@ -252,6 +294,54 @@ The project must be fully testable in GitHub Codespaces with `npm run dev`.
 
 ---
 
+## Session Logs (DevLog/)
+
+`DevLog/log-YYYY-MM-DD.md` is the authoritative per-day log. Format:
+
+```
+# DevLog — YYYY-MM-DD
+
+Branch: <branch-name>
+Session goal: <one-line summary>
+
+## Done
+- <SHA> — <short description>
+
+## To do
+- <next task>
+
+## Future problems / regression risks
+- <known sharp edge surfaced this session>
+
+## Things to improve / refactor
+- <code-smell, perf opportunity, a11y gap — defer-OK>
+
+## Open questions for the user
+- <decision needed before continuing>
+```
+
+Rules:
+- One file per calendar day, named exactly `log-YYYY-MM-DD.md`.
+- Append, don't rewrite. Multiple sessions on the same day stack as sub-headers.
+- Always reference commit SHAs in "Done".
+- Write logs so the next session — possibly with a fresh context window — can pick up cold.
+
+---
+
+## Asset Handling
+
+When an asset is missing (species photo, background illustration, icon):
+- Add a placeholder in the correct location (e.g., `public/images/species/placeholder.svg`).
+- Append an entry to `MISSING_ASSETS.md` at repo root with:
+  - Expected file name
+  - Target folder (repo-relative path)
+  - What it's for (which page, which component)
+  - The placeholder currently used
+
+The user will provide real assets; placeholders get swapped in one pass.
+
+---
+
 ## Iteration Process
 
 1. **Propose** — describe the feature or change.
@@ -262,3 +352,15 @@ The project must be fully testable in GitHub Codespaces with `npm run dev`.
 6. **Cite** — register any new data sources in DATA_SOURCES_REGISTRY.md.
 7. **Review** — consult Code Reviewer and Accessibility Auditor agents.
 8. **Commit & push** — with descriptive message.
+
+---
+
+## Living Documents
+
+| File | Purpose |
+|------|---------|
+| `CLAUDE.md` | This file — project rules, read every session |
+| `data/sources/DATA_SOURCES_REGISTRY.md` | All data sources with species/country mapping |
+| `DevLog/log-YYYY-MM-DD.md` | Daily session logs |
+| `MISSING_ASSETS.md` | Pending asset placeholder list |
+| `AIAgents/` | Agent persona library — do not modify these files unless the user explicitly asks |
