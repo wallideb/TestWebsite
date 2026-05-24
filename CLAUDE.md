@@ -1,10 +1,21 @@
-# CLAUDE.md — RaptorWatch: Global Birds of Prey Nest Tracker
+# CLAUDE.md — RaptorNest: Global Birds of Prey Nest Tracker
 
 ## Project Overview
 
-**RaptorWatch** is a modern, interactive web platform that aggregates and displays real-time data about birds of prey nests worldwide. It pulls from public ornithological databases, conservation APIs, live nest cameras, and verified citizen-science sources to provide a rich, visual experience for researchers, bird enthusiasts, and conservation organizations.
+**RaptorNest** is a modern, interactive web platform that aggregates and displays real-time data about birds of prey nests worldwide. MVP scope: **European raptors** (Peregrine Falcon, Golden Eagle, White-tailed Eagle, Eurasian Eagle-Owl, Osprey, and others with strong monitoring data). It pulls from public ornithological databases, conservation APIs, live nest cameras, and verified citizen-science sources to provide a rich, visual experience for researchers, bird enthusiasts, and conservation organizations.
 
 The interface must be visually stunning — illustrated backgrounds, real-time imagery, species portraits, and smooth interactivity — while remaining scientifically rigorous with proper sourcing and citations.
+
+### Competitive Landscape & Differentiation
+
+Existing platforms we should integrate with (not compete against):
+- **NestWatch** (Cornell Lab) — citizen-science nest monitoring for all birds. Not raptor-specific, no live cameras, basic UI.
+- **GRIN** (Peregrine Fund) — raptor-specific database (200k+ entries). Data-collection tool, not a visual experience.
+- **European Raptors** — static ID guide. No maps, no real-time data.
+- **Hawk Mountain / Movebank** — GPS migration tracking. Not nest-focused.
+- **Live cameras** — scattered across dozens of individual sites (Raptor Resource Project, Virginia Falcon Cam, etc.). No aggregator exists.
+
+**RaptorNest fills the gap**: the visual, interactive aggregation layer that combines nest data from GRIN/eBird/GBIF with live camera feeds, protection status, individual bird IDs, and rich species profiles — all in a modern, beautiful interface.
 
 ---
 
@@ -76,7 +87,7 @@ All agents are located in the `AIAgents/` folder (cloned from [agency-agents](ht
 
 ### Selected Agents for This Project
 
-| Agent | File | Role in RaptorWatch |
+| Agent | File | Role in RaptorNest |
 |-------|------|---------------------|
 | **Agents Orchestrator** | `specialized/agents-orchestrator.md` | Coordinates multi-agent workflows across features |
 | **Software Architect** | `engineering/engineering-software-architect.md` | Overall system architecture, domain modeling |
